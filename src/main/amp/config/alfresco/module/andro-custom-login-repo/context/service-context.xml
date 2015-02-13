@@ -17,19 +17,25 @@
     limitations under the License.
 -->
 <beans>
-    
-    <!-- A simple class that is initialized by Spring -->
-    <bean id="changeme.exampleBean" class="org.alfresco.demoamp.Demo" init-method="init" />
-    
-    <!-- A simple module component that will be executed once -->
-    <bean id="changeme.exampleComponent" class="org.alfresco.demoamp.DemoComponent" parent="module.baseComponent" >
-        <property name="moduleId" value="${project.artifactId}" />  <!-- See module.properties -->
-        <property name="name" value="exampleComponent" />
-        <property name="description" value="A demonstration component" />
-        <property name="sinceVersion" value="2.0" />
-        <property name="appliesFromVersion" value="2.0" />
-        <property name="nodeService" ref="NodeService" />
-        <property name="nodeLocatorService" ref="nodeLocatorService" />
+
+    <!-- Bootstrap -->
+    <bean id="com.androgogic.base.emailTemplateBootstrap" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
+        <property name="moduleId" value="andro-custom-login-repo" />
+        <property name="name" value="alfresco-custom-login-repo-emailTemplateBootstrap" />
+        <property name="description" value="Initial Data Dictionary Email Template import" />
+        <property name="sinceVersion" value="0.4" />
+        <property name="appliesFromVersion" value="0.4" />
+
+        <!-- Data properties -->
+        <property name="importer" ref="spacesBootstrap"/>
+        <property name="bootstrapViews">
+            <list>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.email.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/andro-email-template-bootstrap.acp</prop>
+                </props>
+            </list>
+        </property>
     </bean>
-    
+
 </beans>
