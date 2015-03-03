@@ -1,5 +1,6 @@
 .idea/
-target/
+target/*
+!target/*.amp
 alf_data_dev/
 *.log
 *.iml
