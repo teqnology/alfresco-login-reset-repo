@@ -1,0 +1,9 @@
+<webscript>
+	<shortname>List Users Password Workflow</shortname>
+	<description>Lists mutliple users with the supplied email if the specified workflow exists</description>
+	<url>/andro/base/login/list-users</url>
+	<authentication runas="admin">none</authentication>
+	<format default="json">extension</format>
+	<transaction>required</transaction>
+	<family>Andro Base</family>
+</webscript>
