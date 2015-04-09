@@ -20,9 +20,6 @@
 
     <!-- Bootstrap -->
     <bean id="com.androgogic.base.login.androBootstrap" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
-        <property name="useExistingStore">
-            <value>false</value>
-        </property>
         <property name="moduleId" value="andro-custom-login-repo" />
         <property name="name" value="alfresco-custom-login-repo-androBootstrap" />
         <property name="description" value="Initial Data Dictionary Email Template and Scripts import" />
