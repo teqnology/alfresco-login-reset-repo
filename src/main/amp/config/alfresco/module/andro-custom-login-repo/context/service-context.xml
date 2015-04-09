@@ -31,6 +31,7 @@
         <property name="bootstrapViews">
             <list>
                 <props>
+                    <prop key="uuidBinding">UPDATE_EXISTING</prop>
                     <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.email.childname}</prop>
                     <prop key="location">alfresco/bootstrap/andro-email-template-bootstrap.acp</prop>
                 </props>
@@ -50,6 +51,7 @@
         <property name="bootstrapViews">
             <list>
                 <props>
+                    <prop key="uuidBinding">UPDATE_EXISTING</prop>
                     <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.scripts.childname}</prop>
                     <prop key="location">alfresco/bootstrap/end-workflow-bootstrap.acp</prop>
                 </props>
