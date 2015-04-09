@@ -38,4 +38,23 @@
         </property>
     </bean>
 
+    <bean id="com.androgogic.base.endWorkflowBootstrap" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
+        <property name="moduleId" value="andro-custom-login-repo" />
+        <property name="name" value="alfresco-custom-login-repo-endWorkflowBootstrap" />
+        <property name="description" value="Initial Data Dictionary Scripts import" />
+        <property name="sinceVersion" value="0.4" />
+        <property name="appliesFromVersion" value="0.4" />
+
+        <!-- Data properties -->
+        <property name="importer" ref="spacesBootstrap"/>
+        <property name="bootstrapViews">
+            <list>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.scripts.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/end-workflow-bootstrap.acp</prop>
+                </props>
+            </list>
+        </property>
+    </bean>
+
 </beans>
