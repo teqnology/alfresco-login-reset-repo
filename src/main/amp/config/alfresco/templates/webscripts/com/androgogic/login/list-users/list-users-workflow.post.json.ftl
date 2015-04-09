@@ -5,8 +5,8 @@
    "users": [
 	   <#list users as u>
 	   	{
-                  "user": "${u}"
-                }<#if u_has_next>,</#if>
+            "user": "${u}"
+        }<#if u_has_next>,</#if>
 	   </#list>
    ]
 }

@@ -19,10 +19,13 @@
 <beans>
 
     <!-- Bootstrap -->
-    <bean id="com.androgogic.base.emailTemplateBootstrap" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
+    <bean id="com.androgogic.base.login.androBootstrap" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
+        <property name="useExistingStore">
+            <value>false</value>
+        </property>
         <property name="moduleId" value="andro-custom-login-repo" />
-        <property name="name" value="alfresco-custom-login-repo-emailTemplateBootstrap" />
-        <property name="description" value="Initial Data Dictionary Email Template import" />
+        <property name="name" value="alfresco-custom-login-repo-androBootstrap" />
+        <property name="description" value="Initial Data Dictionary Email Template and Scripts import" />
         <property name="sinceVersion" value="0.4" />
         <property name="appliesFromVersion" value="0.4" />
 
@@ -31,27 +34,14 @@
         <property name="bootstrapViews">
             <list>
                 <props>
-                    <prop key="uuidBinding">UPDATE_EXISTING</prop>
+                    <!-- CREATE_NEW, CREATE_NEW_WITH_UUID, REMOVE_EXISTING, REPLACE_EXISTING, UPDATE_EXISTING, THROW_ON_COLLISION -->
+                    <prop key="uuidBinding">REPLACE_EXISTING</prop>
                     <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.email.childname}</prop>
                     <prop key="location">alfresco/bootstrap/andro-email-template-bootstrap.acp</prop>
                 </props>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="com.androgogic.base.endWorkflowBootstrap" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
-        <property name="moduleId" value="andro-custom-login-repo" />
-        <property name="name" value="alfresco-custom-login-repo-endWorkflowBootstrap" />
-        <property name="description" value="Initial Data Dictionary Scripts import" />
-        <property name="sinceVersion" value="0.4" />
-        <property name="appliesFromVersion" value="0.4" />
-
-        <!-- Data properties -->
-        <property name="importer" ref="spacesBootstrap"/>
-        <property name="bootstrapViews">
-            <list>
                 <props>
-                    <prop key="uuidBinding">UPDATE_EXISTING</prop>
+                    <!-- CREATE_NEW, CREATE_NEW_WITH_UUID, REMOVE_EXISTING, REPLACE_EXISTING, UPDATE_EXISTING, THROW_ON_COLLISION -->
+                    <prop key="uuidBinding">REPLACE_EXISTING</prop>
                     <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.scripts.childname}</prop>
                     <prop key="location">alfresco/bootstrap/end-workflow-bootstrap.acp</prop>
                 </props>
