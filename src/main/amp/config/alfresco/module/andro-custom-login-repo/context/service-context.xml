@@ -25,6 +25,7 @@
         <property name="description" value="Initial Data Dictionary Email Template and Scripts import" />
         <property name="sinceVersion" value="0.4" />
         <property name="appliesFromVersion" value="0.4" />
+        <property name="executeOnceOnly" value="true" />
 
         <!-- Data properties -->
         <property name="importer" ref="spacesBootstrap"/>
