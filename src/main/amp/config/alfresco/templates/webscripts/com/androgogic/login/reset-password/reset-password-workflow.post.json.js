@@ -20,9 +20,7 @@ function checkValue(value){
   }
 } 
 function resetPassword(user, password){
-   if (password == null || password == ""){
-     people.setPassword(user.userName, password);
-   }
+   people.setPassword(user.properties.userName, password);
    return user;
 }
 function getUserbyUsername(username){
@@ -105,7 +103,7 @@ function main(){
     // Reset password
     try{
       resetPassword(user, password);
-      logger.log("reset-password workflow password udated for username: " + username);
+      logger.log("reset-password workflow password updated for username: " + username);
     } catch (e){
       status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "The password was not reset. Here is the detailed error: " + e);
       status.redirect = true;
