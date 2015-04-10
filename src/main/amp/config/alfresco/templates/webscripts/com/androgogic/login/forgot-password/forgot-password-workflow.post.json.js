@@ -98,7 +98,7 @@ function getActivitiId(key){
     var wf = workflow.getAssignedTasks();
     for(var w = 0; w < wf.length; w++){
       if(wf[w].properties["bpm:description"] == key){
-        activitiId = wf[w].id;
+        activitiId = "activiti$" + wf[w].properties["bpm:taskId"];
       }else{
         activitiId = "";
       }
