@@ -4,7 +4,7 @@
  * @method POST
  * @param
  * {
- *    email: ${email};
+ *  email: ${email};
  * }
  * 
  */

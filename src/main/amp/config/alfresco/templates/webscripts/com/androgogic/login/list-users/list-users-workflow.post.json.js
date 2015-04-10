@@ -1,13 +1,13 @@
 /**
- *  * Workflow reset password script
- *   * 
- *    * @method POST
- *     * @param
- *      * {
- *       *    email: ${email};
- *        * }
- *         * 
- *          */
+ * Workflow reset password script
+ *
+ * @method POST
+ * @param
+ * {
+ *  email: ${email};
+ * }
+ * *
+ * */
 
 model.result = false;
 model.message = "";
