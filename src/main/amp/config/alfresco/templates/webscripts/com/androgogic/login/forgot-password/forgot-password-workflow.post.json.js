@@ -147,11 +147,12 @@ function main(){
       return;
      }
     }else if (users.length == 1){
+      user = search.findNode(users[0]);
       startWorkflow(key);
       activitiId = getActivitiId(key);
       // Send e-mail
       try{
-        sendMailForgotPasswordWorkflow(users, "If you did not request your password to be reset, you can normally ignore this email.", key, activitiId);
+        sendMailForgotPasswordWorkflow(user, "If you did not request your password to be reset, you can normally ignore this email.", key, activitiId);
       } catch (e){
         status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "The email with the instructions was not sent. Please retry or contact your system administrator. Here is the detailed error: " + e);
         status.redirect = true;
