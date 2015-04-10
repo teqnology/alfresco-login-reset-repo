@@ -52,7 +52,6 @@ function sendEmailResetPassword(email, emailcontent){
   // create mail action
   var mail = actions.create("mail");
   mail.parameters.to = email;
-  mail.parameters.from = "noreply@alfresco.com";
   mail.parameters.subject = "Alfresco - Reset Password Request";
   var map = new Object();
   map["emailcontent"] = emailcontent;

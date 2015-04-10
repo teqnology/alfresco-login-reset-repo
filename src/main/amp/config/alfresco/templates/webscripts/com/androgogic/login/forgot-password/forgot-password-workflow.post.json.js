@@ -47,7 +47,6 @@ function sendMailForgotPasswordWorkflow(u, emailcontent, key, activitiId){
   // create mail action
   var mail = actions.create("mail");
   mail.parameters.to = u.properties.email;
-  mail.parameters.from = "noreply@alfresco.com";
   mail.parameters.subject = "Alfresco - Reset Password Instructions";
   var map = new Object();
   map["email"] = u.properties.email;
@@ -68,7 +67,6 @@ function sendMailMultiUser(u, arr, emailcontent, key, activitiId){
   // create mail action
   var mail = actions.create("mail");
   mail.parameters.to = u.properties.email;
-  mail.parameters.from = "noreply@alfresco.com";
   mail.parameters.subject = "Alfresco - Reset Password Instructions";
   var map = new Object();
   map["email"] = u.properties.email;
@@ -95,10 +93,13 @@ function getUserbyUsername(username){
 }
 function getActivitiId(key){
     var activitiId;
+    var k;
     var wf = workflow.getAssignedTasks();
     for(var w = 0; w < wf.length; w++){
-      if(wf[w].properties["bpm:description"] == key){
+      k = wf[w].properties["bpm:description"];
+      if(k==key){
         activitiId = "activiti$" + wf[w].properties["bpm:taskId"];
+        return activitiId;
       }else{
         activitiId = "";
       }
