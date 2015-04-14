@@ -19,9 +19,9 @@
 <beans>
 
     <!-- Bootstrap -->
-    <bean id="com.androgogic.base.login.androBootstrap" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
-        <property name="moduleId" value="andro-custom-login-repo" />
-        <property name="name" value="alfresco-custom-login-repo-androBootstrap" />
+    <bean id="com.androgogic.base.login.alfrescoBootstrap" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
+        <property name="moduleId" value="alfresco-login-reset-repo" />
+        <property name="name" value="alfresco-login-reset-repo-alfrescoBootstrap" />
         <property name="description" value="Initial Data Dictionary Email Template and Scripts import" />
         <property name="sinceVersion" value="0.4" />
         <property name="appliesFromVersion" value="0.4" />
@@ -35,7 +35,7 @@
                     <!-- CREATE_NEW, CREATE_NEW_WITH_UUID, REMOVE_EXISTING, REPLACE_EXISTING, UPDATE_EXISTING, THROW_ON_COLLISION -->
                     <prop key="uuidBinding">REPLACE_EXISTING</prop>
                     <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.email.childname}</prop>
-                    <prop key="location">alfresco/bootstrap/andro-email-template-bootstrap.acp</prop>
+                    <prop key="location">alfresco/bootstrap/alfresco-email-template-bootstrap.acp</prop>
                 </props>
                 <props>
                     <!-- CREATE_NEW, CREATE_NEW_WITH_UUID, REMOVE_EXISTING, REPLACE_EXISTING, UPDATE_EXISTING, THROW_ON_COLLISION -->

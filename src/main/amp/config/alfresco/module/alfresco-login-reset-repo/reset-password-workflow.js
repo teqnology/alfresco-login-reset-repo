@@ -11,7 +11,7 @@ function endExpiredWorkflow(){
         if(n>d){
             var t = workflow.getTask(a);
             t.endTask("Next");
-            logger.log("activiti workflow ended. Task id: " + a + ". Activiti key: " + k);
+            logger.log("Activiti workflow ended. Task id: " + a + ". Activiti key: " + k);
         }
     }
 }
