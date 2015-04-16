@@ -107,14 +107,21 @@ function getActivitiId(key){
     return activitiId;
 }
 
+function disallowedUsers(u){
+  for ( var i = 0; i < disallowedUsers.length; i++){
+    if (u.properties.userName == disallowedUsers[i]){
+       status.setCode(status.STATUS_FORBIDDEN, "The reset password feature is not available for this user.");
+       status.redirect = true;
+       return;
+     }
+  }
+}
+
 function main(){
 
   var user, u, email, users, activitiId;
-  logs = s["log"].toString() == "true";
   disallowedUsers = s["disallowed-users"].toString().split(",");
   key = getRandomId(key);
-
-  logger.log("hostname: " + host);
 
   if ((json.isNull("email")) || (json.get("email") == null) || (json.get("email").length() == 0)){
     status.setCode(status.STATUS_BAD_REQUEST, "No email or username found");
@@ -137,6 +144,7 @@ function main(){
         usersArray.push(user.properties.userName);
       }
       user = search.findNode(users[0]);
+      disallowedUsers(user);
       startWorkflow(key);
       activitiId = getActivitiId(key);      
      // Send e-mail
@@ -149,6 +157,7 @@ function main(){
      }
     }else if (users.length == 1){
       user = search.findNode(users[0]);
+      disallowedUsers(user);
       startWorkflow(key);
       activitiId = getActivitiId(key);
       // Send e-mail
@@ -163,6 +172,7 @@ function main(){
   }else{
     user = getUserbyUsername(email);
     if(user){
+      disallowedUsers(user);
       startWorkflow(key);
       activitiId = getActivitiId(key);
       // Send e-mail

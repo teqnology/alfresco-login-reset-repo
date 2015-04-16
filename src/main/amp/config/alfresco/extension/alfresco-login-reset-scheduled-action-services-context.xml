@@ -66,11 +66,9 @@
         <property name="queryTemplate">
             <value>PATH:"/app:company_home"</value>
         </property>
-        <!-- Cron script execution every 10 minutes -->
+        <!-- Cron script execution every hour at HH:00:000 -->
         <property name="cronExpression">
-            <value>0 0/10 * * * ?</value>
-            <!-- <value>0 0 1 * * ?</value> -->
-            <!-- <value>0 5 0 1/1 * ? *</value> -->
+            <value>0 0 * * * ?</value>
         </property>
         <property name="jobName">
             <value>endResetPasswordWorkflowD</value>
