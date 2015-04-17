@@ -12,13 +12,6 @@
 model.result = false;
 model.message = "";
 
-function checkValue(value){
-  if ((json.isNull(value)) || (json.get(value) == null) || (json.get(value).length() == 0)){
-    status.setCode(status.STATUS_BAD_REQUEST, "The following value is missing: " + value);
-    status.redirect = true;
-    return;
-  }
-} 
 function resetPassword(user, password){
    people.setPassword(user.properties.userName, password);
    return user;
@@ -66,25 +59,25 @@ function main(){
   var user, username, email, users, activitiId, key, allow;
 
   if ((json.isNull("password")) || (json.get("password") == null) || (json.get("password").length() == 0)){
-    status.setCode(status.STATUS_BAD_REQUEST, "No password has been specified.");
+    status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.noPassword"));
     status.redirect = true;
     return;
   }
 
   if ((json.isNull("username")) || (json.get("username") == null) || (json.get("username").length() == 0)){
-    status.setCode(status.STATUS_BAD_REQUEST, "No user found.");
+    status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.noUser"));
     status.redirect = true;
     return;
   }
 
   if ((json.isNull("activiti")) || (json.get("activiti") == null) || (json.get("activiti").length() == 0)){
-    status.setCode(status.STATUS_BAD_REQUEST, "No request for the password reset found.");
+    status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.noRequest"));
     status.redirect = true;
     return;
   }
 
   if ((json.isNull("key")) || (json.get("key") == null) || (json.get("key").length() == 0)){
-    status.setCode(status.STATUS_BAD_REQUEST, "Invalid key for reset password request.");
+    status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.noKey"));
     status.redirect = true;
     return;
   }
@@ -105,7 +98,7 @@ function main(){
       resetPassword(user, password);
       logger.log("reset-password workflow password updated for username: " + username);
     } catch (e){
-      status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "The password was not reset. Here is the detailed error: " + e);
+      status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, msg.get("error.noReset") + e);
       status.redirect = true;
       return;
     };
@@ -113,7 +106,7 @@ function main(){
     try{
       closeActiviti(activitiId);
     } catch(e){
-      status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "The reset password workflow wasn't ended. Here is the detailed error: " + e);
+      status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, msg.get("error.noWorkflow") + e);
       status.redirect = true;
       return;
     }
@@ -121,13 +114,13 @@ function main(){
     try{
       sendEmailResetPassword(email, "The password for the user: '" + username + "' has been successfully reset.");
     } catch (e){
-      status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "The confirmation email was not sent. Here is the detailed error: " + e);
+      status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, msg.get("error.noMail") + e);
       status.redirect = true;
       return;
     };
   }else{
     logger.log("reset-password workflow failed password update for username: " + username + ". Reason: activitiId, key and username values don't match.");
-    status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "Failed to update the pasword. Either the user doesn't exist or your request is no more valid.");
+    status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, msg.get("error.allowed"));
     status.redirect = true;
     return;    
   }

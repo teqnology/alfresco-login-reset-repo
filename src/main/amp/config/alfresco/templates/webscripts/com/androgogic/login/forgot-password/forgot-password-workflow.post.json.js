@@ -44,41 +44,37 @@ function startWorkflow(key){
   return workflow.execute(companyhome);
 }
 function sendMailForgotPasswordWorkflow(u, emailcontent, key, activitiId){
-  // create mail action
   var mail = actions.create("mail");
   mail.parameters.to = u.properties.email;
-  mail.parameters.subject = "Alfresco - Reset Password Instructions";
+  mail.parameters.subject = msg.get("subject.text");
+  // Maps an object with values to be used in the email templates as variables: (eg. ${emailcontent})
   var map = new Object();
   map["email"] = u.properties.email;
   map["emailcontent"] = emailcontent;
   map["key"] = key;
   map["activitiId"] = activitiId;
   map["users"] = [];
-  map["resetlink"] = "Reset Password";
+  map["resetlink"] = msg.get("template.resetLink");
   mail.parameters.template_model = map;   
   mail.parameters.template = companyhome.childByNamePath("Data Dictionary/Email Templates/andro-email-template/forgot-password-email.ftl");
-  //mail.parameters.text = "We received a request to reset the password associated with this e-mail address. If you did not request your password to be reset, you can normally ignore this email."
-  // execute action against a space
   mail.execute(companyhome);
   logger.log("forgot-password workflow mail -workflow start- sent to: " + u.properties.email);
   return mail;
 }
 function sendMailMultiUser(u, arr, emailcontent, key, activitiId){
-  // create mail action
   var mail = actions.create("mail");
   mail.parameters.to = u.properties.email;
-  mail.parameters.subject = "Alfresco - Reset Password Instructions";
+  mail.parameters.subject = msg.get("subject.text");
+  // Maps an object with values to be used in the email templates as variables: (eg. ${emailcontent})
   var map = new Object();
   map["email"] = u.properties.email;
   map["emailcontent"] = emailcontent;
   map["key"] = key;
   map["activitiId"] = activitiId;
   map["users"] = arr;
-  map["resetlink"] = "Select account and reset password";
+  map["resetlink"] = msg.get("template.resetLinkMulti");
   mail.parameters.template_model = map;   
   mail.parameters.template = companyhome.childByNamePath("Data Dictionary/Email Templates/andro-email-template/forgot-password-email.ftl");
-  //mail.parameters.text = "We received a request to reset the password associated with this e-mail address. We found multiple accounts bound with this account: " + arr.toString() + "."
-  // execute action against a space
   logger.log("forgot-password workflow mail -multiple users found- sent to: " + u.properties.email);
   mail.execute(companyhome);
   return mail;
@@ -106,11 +102,10 @@ function getActivitiId(key){
     }
     return activitiId;
 }
-
 function disallowedUsers(u){
   for ( var i = 0; i < disallowedUsers.length; i++){
     if (u.properties.userName == disallowedUsers[i]){
-       status.setCode(status.STATUS_FORBIDDEN, "The reset password feature is not available for this user.");
+       status.setCode(status.STATUS_FORBIDDEN, msg.get("error.disallowedUsers"));
        status.redirect = true;
        return;
      }
@@ -123,18 +118,21 @@ function main(){
   disallowedUsers = s["disallowed-users"].toString().split(",");
   key = getRandomId(key);
 
+  // Returns error if no username or email is provided in the input field
   if ((json.isNull("email")) || (json.get("email") == null) || (json.get("email").length() == 0)){
-    status.setCode(status.STATUS_BAD_REQUEST, "No email or username found");
+    status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.noEmailOrUsername"));
     status.redirect = true;
     return;
   }
 
   email = json.get("email");
 
+  // If input value has "@" assumes it's an email.
   if (email.indexOf("@") > -1){
     users = getUsersByEmail(email);
+    // Checks if "users" returns more than one result.
     if (users.length == 0){
-      status.setCode(status.STATUS_BAD_REQUEST, "Unfortunately this account does not exist in our registered user list. Please try another email or contact your system administrator.");
+      status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.noEmailFound"));
       status.redirect = true;
       return;
     }else if (users.length > 1){
@@ -143,33 +141,35 @@ function main(){
         user = search.findNode(users[i]);
         usersArray.push(user.properties.userName);
       }
-      user = search.findNode(users[0]);
-      disallowedUsers(user);
-      startWorkflow(key);
-      activitiId = getActivitiId(key);      
-     // Send e-mail
-     try{
-      sendMailMultiUser(user, usersArray, "We found multiple accounts registered with this email. ", key, activitiId);
-     } catch (e){
-      status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "The email with the instructions was not sent. Please retry or contact your system administrator. Here is the detailed error: " + e);
-      status.redirect = true;
-      return;
-     }
-    }else if (users.length == 1){
+      // As the email is the same for all users in the array, get user object in order to send reset password instructions to the correct email.
       user = search.findNode(users[0]);
       disallowedUsers(user);
       startWorkflow(key);
       activitiId = getActivitiId(key);
-      // Send e-mail
+      // attempts to send the email
+     try{
+      sendMailMultiUser(user, usersArray, msg.get("template.multiple"), key, activitiId);
+     } catch (e){
+      status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, msg.get("error.mail") + e);
+      status.redirect = true;
+      return;
+     }
+    }else if (users.length == 1){
+      // If only one user is returned get user object and attempts to send the email
+      user = search.findNode(users[0]);
+      disallowedUsers(user);
+      startWorkflow(key);
+      activitiId = getActivitiId(key);
       try{
-        sendMailForgotPasswordWorkflow(user, "If you did not request your password to be reset, you can normally ignore this email.", key, activitiId);
+        sendMailForgotPasswordWorkflow(user, msg.get("template.ignore"), key, activitiId);
       } catch (e){
-        status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "The email with the instructions was not sent. Please retry or contact your system administrator. Here is the detailed error: " + e);
+        status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, msg.get("error.mail") + e);
         status.redirect = true;
         return;
       }
     }
   }else{
+    // If no "@" is found in the input value assume it's a username
     user = getUserbyUsername(email);
     if(user){
       disallowedUsers(user);
@@ -177,14 +177,14 @@ function main(){
       activitiId = getActivitiId(key);
       // Send e-mail
       try{
-        sendMailForgotPasswordWorkflow(user, "If you did not request your password to be reset, you can normally ignore this email.", key, activitiId);
+        sendMailForgotPasswordWorkflow(user, msg.get("template.ignore"), key, activitiId);
       } catch (e){
-        status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "The email with the instructions was not sent. Please retry or contact your system administrator. Here is the detailed error: " + e);
+        status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, msg.get("error.mail") + e);
         status.redirect = true;
         return;
       }
     }else{
-      status.setCode(status.STATUS_BAD_REQUEST, "Unfortunately this account does not exist in our registered user list. Please try another username or contact your system administrator.");
+      status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.noUser"));
       status.redirect = true;
       return;
     }

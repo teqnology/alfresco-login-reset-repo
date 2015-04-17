@@ -13,13 +13,6 @@ model.result = false;
 model.message = "";
 model.users = [];
 
-function checkValue(value){
-  if ((json.isNull(value)) || (json.get(value) == null) || (json.get(value).length() == 0)){
-  status.setCode(status.STATUS_BAD_REQUEST, "The following value is missing: " + value);
-  status.redirect = true;
-  return;
-  }
-}
 function getUsersByEmail(email){
   var filter = "email:" + email;
   users = people.getPeople(filter);
@@ -44,17 +37,17 @@ function main(){
   var email, users, activitiId, key, allow;
 
   if ((json.isNull("email")) || (json.get("email") == null) || (json.get("email").length() == 0)){
-    status.setCode(status.STATUS_BAD_REQUEST, "Missing argument: email.");
+    status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.missingArgument") + "email.");
     status.redirect = true;
     return;
   }
   if ((json.isNull("activiti")) || (json.get("activiti") == null) || (json.get("activiti").length() == 0)){
-    status.setCode(status.STATUS_BAD_REQUEST, "Missing argument: activiti.");
+    status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.missingArgument") + "activiti.");
     status.redirect = true;
     return;
   }
   if ((json.isNull("key")) || (json.get("key") == null) || (json.get("key").length() == 0)){
-    status.setCode(status.STATUS_BAD_REQUEST, "Missing argument: key.");
+    status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.missingArgument") + "key.");
     status.redirect = true;
     return;
   }
@@ -73,7 +66,7 @@ function main(){
       }
     model.users = usersArray;
   }else{
-    status.setCode(status.STATUS_BAD_REQUEST, "No reset password request found for " + email);
+    status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.noRequest") + email);
     status.redirect = true;
     return;    
   }
