@@ -102,7 +102,7 @@ function getActivitiId(key){
     }
     return activitiId;
 }
-function disallowedUsers(u){
+function disallowedUser(u){
   for ( var i = 0; i < disallowedUsers.length; i++){
     if (u.properties.userName == disallowedUsers[i]){
        status.setCode(status.STATUS_FORBIDDEN, msg.get("error.disallowedUsers"));
@@ -143,7 +143,7 @@ function main(){
       }
       // As the email is the same for all users in the array, get user object in order to send reset password instructions to the correct email.
       user = search.findNode(users[0]);
-      disallowedUsers(user);
+      disallowedUser(user);
       startWorkflow(key);
       activitiId = getActivitiId(key);
       // attempts to send the email
@@ -157,7 +157,7 @@ function main(){
     }else if (users.length == 1){
       // If only one user is returned get user object and attempts to send the email
       user = search.findNode(users[0]);
-      disallowedUsers(user);
+      disallowedUser(user);
       startWorkflow(key);
       activitiId = getActivitiId(key);
       try{
@@ -172,7 +172,7 @@ function main(){
     // If no "@" is found in the input value assume it's a username
     user = getUserbyUsername(email);
     if(user){
-      disallowedUsers(user);
+      disallowedUser(user);
       startWorkflow(key);
       activitiId = getActivitiId(key);
       // Send e-mail
