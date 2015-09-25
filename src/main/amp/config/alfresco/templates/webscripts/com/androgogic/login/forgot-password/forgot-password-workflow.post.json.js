@@ -56,7 +56,7 @@ function sendMailForgotPasswordWorkflow(u, emailcontent, key, activitiId){
   map["users"] = [];
   map["resetlink"] = msg.get("template.resetLink");
   mail.parameters.template_model = map;   
-  mail.parameters.template = companyhome.childByNamePath("Data Dictionary/Email Templates/andro-email-template/forgot-password-email.ftl");
+  mail.parameters.template = companyhome.childByNamePath("Data Dictionary/Email Templates/custom-email-template/forgot-password-email.ftl");
   mail.execute(companyhome);
   logger.log("forgot-password workflow mail -workflow start- sent to: " + u.properties.email);
   return mail;
@@ -74,7 +74,7 @@ function sendMailMultiUser(u, arr, emailcontent, key, activitiId){
   map["users"] = arr;
   map["resetlink"] = msg.get("template.resetLinkMulti");
   mail.parameters.template_model = map;   
-  mail.parameters.template = companyhome.childByNamePath("Data Dictionary/Email Templates/andro-email-template/forgot-password-email.ftl");
+  mail.parameters.template = companyhome.childByNamePath("Data Dictionary/Email Templates/custom-email-template/forgot-password-email.ftl");
   logger.log("forgot-password workflow mail -multiple users found- sent to: " + u.properties.email);
   mail.execute(companyhome);
   return mail;

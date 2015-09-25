@@ -1,0 +1,8 @@
+mail.host=localhost
+mail.port=2525
+mail.protocol=smtp
+mail.encoding=UTF-8
+mail.smtp.starttls.enable=false
+mail.smtp.auth=false
+mail.smtp.timeout=30000
+mail.smtp.debug=true
