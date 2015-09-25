@@ -47,7 +47,7 @@ function sendEmailResetPassword(email, emailcontent){
   var map = new Object();
   map["emailcontent"] = emailcontent;
   mail.parameters.template_model = map;   
-  mail.parameters.template = companyhome.childByNamePath("Data Dictionary/Email Templates/andro-email-template/reset-password-email.ftl");
+  mail.parameters.template = companyhome.childByNamePath("Data Dictionary/Email Templates/custom-email-template/reset-password-email.ftl");
   // execute action against a space
   mail.execute(companyhome);
   logger.log("reset-password workflow mail -reset password- sent to: " + email);
