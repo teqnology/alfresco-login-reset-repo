@@ -57,7 +57,7 @@ function sendMailForgotPasswordWorkflow(u, emailcontent, key, activitiId){
   map["resetlink"] = msg.get("template.resetLink");
   mail.parameters.template_model = map;
   /* Support for localization and fix for non-english Alfresco instances.Also fix to missing template */
-  var mailTemplates = search.xpathSearch("/app:company_home/app:dictionary/app:email_templates/cm:custom-email-template/forgot-password-email.ftl");
+  var mailTemplates = search.xpathSearch("/app:company_home/app:dictionary/app:email_templates/cm:custom-email-template/cm:forgot-password-email.ftl");
   //mail.parameters.template = companyhome.childByNamePath("Data Dictionary/Email Templates/custom-email-template/forgot-password-email.ftl");
   if(mailTemplates.length > 0){
     mail.parameters.template = mailTemplates[0];
@@ -82,7 +82,7 @@ function sendMailMultiUser(u, arr, emailcontent, key, activitiId){
   map["resetlink"] = msg.get("template.resetLinkMulti");
   mail.parameters.template_model = map;   
   /* Support for localization and fix for non-english Alfresco instances.Also fix to missing template */
-  var mailTemplates = search.xpathSearch("/app:company_home/app:dictionary/app:email_templates/cm:custom-email-template/forgot-password-email.ftl");
+  var mailTemplates = search.xpathSearch("/app:company_home/app:dictionary/app:email_templates/cm:custom-email-template/cm:forgot-password-email.ftl");
   //mail.parameters.template = companyhome.childByNamePath("Data Dictionary/Email Templates/custom-email-template/forgot-password-email.ftl");
   if(mailTemplates.length > 0){
     mail.parameters.template = mailTemplates[0];
