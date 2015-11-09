@@ -128,7 +128,7 @@ function disallowedUser(u){
 
 function main(){
 
-  var user, u, email, users, activitiId;
+  var user, u, email, users, activitiId, userPref;
   disallowedUsers = s["disallowed-users"].toString().split(",");
   key = getRandomId(key);
 
@@ -160,6 +160,7 @@ function main(){
       disallowedUser(user);
       startWorkflow(key);
       activitiId = getActivitiId(key);
+      preferenceService.setPreferences(user.properties.userName, {com:{androgogic:{login:{key:key,activiti:activitiId}}}});
       // attempts to send the email
      try{
       sendMailMultiUser(user, usersArray, msg.get("template.multiple"), key, activitiId);
@@ -174,6 +175,7 @@ function main(){
       disallowedUser(user);
       startWorkflow(key);
       activitiId = getActivitiId(key);
+      preferenceService.setPreferences(user.properties.userName, {com:{androgogic:{login:{key:key,activiti:activitiId}}}});
       try{
         sendMailForgotPasswordWorkflow(user, msg.get("template.ignore"), key, activitiId);
       } catch (e){
@@ -189,6 +191,7 @@ function main(){
       disallowedUser(user);
       startWorkflow(key);
       activitiId = getActivitiId(key);
+      preferenceService.setPreferences(user.properties.userName, {com:{androgogic:{login:{key:key,activiti:activitiId}}}});
       // Send e-mail
       try{
         sendMailForgotPasswordWorkflow(user, msg.get("template.ignore"), key, activitiId);

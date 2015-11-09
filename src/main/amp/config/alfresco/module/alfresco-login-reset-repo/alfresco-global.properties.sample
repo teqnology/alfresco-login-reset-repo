@@ -1,5 +1,5 @@
 mail.host=localhost
-mail.port=2525
+mail.port=25
 mail.protocol=smtp
 mail.encoding=UTF-8
 mail.smtp.starttls.enable=false

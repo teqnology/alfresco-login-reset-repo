@@ -22,19 +22,34 @@ function getUserbyUsername(username){
 function getUserEmail(user){  
   return user.properties.email.toLowerCase();
 }
-function isActiviti(activitiId, key){
+
+//TODO fix isActiviti check for improved security
+function isActiviti(user, activitiId, key){
   var activiti = false;
-  var k, a;
+  var a, userPref;
   var wf = workflow.getAssignedTasks();
   for(var w = 0; w < wf.length; w++){
     a = "activiti$" + wf[w].properties["bpm:taskId"];
-    k = wf[w].properties["bpm:description"];
-    if(k==key && a==activitiId){
-      return activiti = true;
+    if(a==activitiId){
+      userPref = preferenceService.getPreferences(user.properties.userName, "com.androgogic.login");
+      if (userPref.com != null){
+        var userKey = userPref.com.androgogic.login.key;
+        var userActiviti = userPref.com.androgogic.login.activiti;
+        if(userKey==key && userActiviti==a){
+          return activiti = true;
+        }else{
+          logger.log("reset-password-workflow failed password update for activiti request:  " + activitiId + ". Reason: either activitiID or key do not match with the original request.");
+          return activiti;
+        }
+      }else{
+        logger.log("reset-password-workflow failed password update for activiti request:  " + activitiId + ". Reason: preferenceService.getPreferences() did not return activiti and key values.");
+        return activiti;
+      }
     }
   }
   return activiti;
 }
+
 function closeActiviti(activitiId){
   var task = workflow.getTask(activitiId);
   task.endTask("Next");
@@ -96,13 +111,14 @@ function main(){
 
   user = getUserbyUsername(username);
   email = getUserEmail(user);
-  allow = isActiviti(activitiId, key);
+  allow = isActiviti(user, activitiId, key);
 
   if(user && allow==true){
     logger.log("reset-password workflow request for username: " + username);
     // Reset password
     try{
       resetPassword(user, password);
+      preferenceService.setPreferences(user.properties.userName, {com:{androgogic:{login:{key:"",activiti:""}}}});
       logger.log("reset-password workflow password updated for username: " + username);
     } catch (e){
       status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, msg.get("error.noReset") + e);

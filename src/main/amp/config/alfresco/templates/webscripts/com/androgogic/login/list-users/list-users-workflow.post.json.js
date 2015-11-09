@@ -53,6 +53,8 @@ function main(){
   }
 
   email = json.get("email");
+  // Fix to FF and IE character escaping
+  email = email.replace("%40","@");
   activitiId = json.get("activiti");
   key = json.get("key");
   users = getUsersByEmail(email);
