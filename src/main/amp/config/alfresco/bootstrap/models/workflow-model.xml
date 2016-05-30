@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Definition of new Model -->
+<model name="agwf:workflowmodel"
+	xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+	<!-- Imports are required to allow references to definitions in other models -->
+	<imports>
+		<import uri="http://www.alfresco.org/model/dictionary/1.0"
+			prefix="d" />
+		<import uri="http://www.alfresco.org/model/bpm/1.0"
+			prefix="bpm" />
+		<import uri="http://www.alfresco.org/model/workflow/1.0" prefix="wf" />
+	</imports>
+
+	<!-- Introduction of new namespaces defined by this model -->
+	<namespaces>
+		<namespace uri="http://www.androgogic.com/model/workflow/1.0"
+			prefix="agwf" />
+	</namespaces>
+
+	<types>
+		<type name="agwf:submitPasswordResetTask">
+			<parent>bpm:startTask</parent>
+        	<mandatory-aspects>
+            	<aspect>bpm:assignee</aspect>
+         	</mandatory-aspects>
+		</type>
+
+        <type name="agwf:passwordResetTask">
+            <parent>wf:adhocTask</parent>
+			<properties>
+				<property name="agwf:relatedUsers">
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<multiple>false</multiple>
+				</property>
+			</properties>
+        </type>
+
+        <type name="agwf:completedPasswordResetTask">
+            <parent>wf:completedAdhocTask</parent>
+        </type>
+	</types>
+</model>

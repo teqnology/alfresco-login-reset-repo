@@ -19,6 +19,10 @@ function getUsersByEmail(email){
     return users;
 }
 
+function getUserbyUsername(username){
+    return people.getPerson(username);
+}
+
 function isActiviti(activitiId, key){
     var activiti = false;
     var k, a;
@@ -26,49 +30,65 @@ function isActiviti(activitiId, key){
     for(var w = 0; w < wf.length; w++){
         a = "activiti$" + wf[w].properties["bpm:taskId"];
         k = wf[w].properties["bpm:description"];
-        if (k==key && a==activitiId) {
-            activiti = true;
+        if (k == key && a == activitiId) {
+            activiti = wf[w].properties["agwf:relatedUsers"].split(',');
         }
     }
     return activiti;
 }
 
-function isArgMissing(json, arg) {
-    if ((json.isNull(arg)) || (json.get(arg) === null) || (json.get(arg).length() === 0)) {
-        status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.missingArgument") + arg + '.');
+function isArgMissing(arg) {
+    if (!json.has(arg) || json.isNull(arg) || json.get(arg).length() === 0) {
+        status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.missingArgument", [arg]));
         status.redirect = true;
         return true;
     }
-    return false;
 }
 
-function main(){
+function main() {
 
-    var email, users, activitiId, key, allow;
+    var i, email, identifier, users, activitiId, key;
 
-    if (isArgMissing(json, "email")) return;
-    if (isArgMissing(json, "activiti")) return;
-    if (isArgMissing(json, "key")) return;
+    if (isArgMissing("activiti")) return;
+    if (isArgMissing("key")) return;
 
-    email = json.get("email");
-    // Fix for FF and IE character escaping
-    email = email.replace("%40","@");
     activitiId = json.get("activiti");
     key = json.get("key");
 
-    users = getUsersByEmail(email);
-    allow = isActiviti(activitiId, key);
-    logger.log("allow reset-password for account " + email + " is set to: " + allow);
-
-    if (allow === true) {
-        var usersArray = [];
-        for (var i = 0; i < users.length; i++) {
-            user = search.findNode(users[i]);
-            usersArray.push(user.properties.userName);
+    // Check if an email or username is provided, error otherwise
+    if (json.has("email") && !json.isNull("email")) {
+        email = json.get("email");
+        users = [];
+        // Fix for FF and IE character escaping
+        identifier = email.replace("%40","@");
+        // build users array
+        var res = getUsersByEmail(identifier);
+        for (i = 0; i < res.length; i++) {
+            users.push(search.findNode(res[i]));
         }
-        model.users = usersArray;
+    } else if (json.has("user") && !json.isNull("user")) {
+        identifier = json.get("user");
+        users = [getUserbyUsername(identifier)];
     } else {
-        status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.noRequest") + email);
+        status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.noEmailOrUser"));
+        status.redirect = true;
+        return;
+    }
+
+    var workflowUsers = isActiviti(activitiId, key);
+
+    if (workflowUsers) {
+        logger.log("reset-password for account " + identifier + " is allowed");
+        for (i = 0; i < users.length; i++) {
+            // Only consider user if it is allowed for the requested workflow
+            if (workflowUsers.indexOf(users[i].properties.userName) > -1) {
+                model.users.push(users[i].properties.userName);
+            }
+        }
+        // model.users = usersArray;
+    } else {
+        logger.log("reset-password for account " + identifier + " is not allowed");
+        status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.noRequest", [identifier]));
         status.redirect = true;
         return;
     }
