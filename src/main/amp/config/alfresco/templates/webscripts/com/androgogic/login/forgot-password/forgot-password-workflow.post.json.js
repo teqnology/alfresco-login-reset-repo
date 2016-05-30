@@ -1,19 +1,19 @@
 /**
  * Workflow forgot password script
- * 
+ *
  * @method POST
  * @param
  * {
  *  email: ${email};
  * }
- * 
+ *
  */
 
 model.result = false;
 model.message = "";
 var s = new XML(config.script);
-var key = parseInt(s["key"].toString(), 10);
-var host = s["hostname"].toString();
+var key = parseInt(s.key.toString(), 10);
+var host = s.hostname.toString();
 
 function getRandomNum(lbound, ubound){
    return (Math.floor(Math.random() * (ubound - lbound)) + lbound);
@@ -22,7 +22,7 @@ function getAssignee(){
   return people.getPerson("admin");
 }
 function getRandomChar(){
-   var chars = s["chars"].toString();
+   var chars = s.chars.toString();
    return chars.charAt(getRandomNum(0, chars.length));
 }
 function getRandomId(n){
@@ -43,55 +43,52 @@ function startWorkflow(key){
   logger.log("forgot-pasword workflow started with name: " + workflow.parameters.workflowName);
   return workflow.execute(companyhome);
 }
-function sendMailForgotPasswordWorkflow(u, emailcontent, key, activitiId){
+function findLocalizedTemplate(mainTplName, locale){
+  var localizedTplName = mainTplName.replace('.ftl', '_'+locale+'.ftl');
+  var mailTemplates = search.xpathSearch('/app:company_home/app:dictionary/app:email_templates/cm:custom-email-template/cm:'+localizedTplName);
+  if(mailTemplates.length === 0){
+    logger.log('Could not find localized template for '+mainTplName+', falling back to default');
+    mailTemplates = search.xpathSearch('/app:company_home/app:dictionary/app:email_templates/cm:custom-email-template/cm:'+mainTplName);
+  }
+  if(mailTemplates.length > 0){
+    return mailTemplates[0];
+  }else{
+    throw 'Missing template: <Data Dictionary/Email Templates/custom-email-template/'+mainTplName+'>';
+  }
+}
+function sendMailForgotPasswordWorkflow(u, emailcontent, key, activitiId, serverLocale){
   var mail = actions.create("mail");
   mail.parameters.to = u.properties.email;
   mail.parameters.subject = msg.get("subject.text");
   // Maps an object with values to be used in the email templates as variables: (eg. ${emailcontent})
-  var map = new Object();
-  map["email"] = u.properties.email;
-  map["emailcontent"] = emailcontent;
-  map["key"] = key;
-  map["activitiId"] = activitiId;
-  map["users"] = [];
-  map["resetlink"] = msg.get("template.resetLink");
+  var map = {};
+  map.email = u.properties.email;
+  map.emailcontent = emailcontent;
+  map.key = key;
+  map.activitiId = activitiId;
+  map.users = [];
+  map.resetlink = msg.get("template.resetLink");
   mail.parameters.template_model = map;
-  /* Support for localization and fix for non-english Alfresco instances.Also fix to missing template */
-  var mailTemplates = search.xpathSearch("/app:company_home/app:dictionary/app:email_templates/cm:custom-email-template/cm:forgot-password-email.ftl");
-  //mail.parameters.template = companyhome.childByNamePath("Data Dictionary/Email Templates/custom-email-template/forgot-password-email.ftl");
-  if(mailTemplates.length > 0){
-    mail.parameters.template = mailTemplates[0];
-  }else{
-    mail.parameters.text = "Missing template: <Data Dictionary/Email Templates/custom-email-template/forgot-password-email.ftl>";
-  }
+  mail.parameters.template = findLocalizedTemplate('forgot-password-email.ftl', serverLocale);
   mail.execute(companyhome);
   logger.log("forgot-password workflow mail -workflow start- sent to: " + u.properties.email);
-  return mail;
 }
-function sendMailMultiUser(u, arr, emailcontent, key, activitiId){
+function sendMailMultiUser(u, arr, emailcontent, key, activitiId, serverLocale){
   var mail = actions.create("mail");
   mail.parameters.to = u.properties.email;
   mail.parameters.subject = msg.get("subject.text");
   // Maps an object with values to be used in the email templates as variables: (eg. ${emailcontent})
-  var map = new Object();
-  map["email"] = u.properties.email;
-  map["emailcontent"] = emailcontent;
-  map["key"] = key;
-  map["activitiId"] = activitiId;
-  map["users"] = arr;
-  map["resetlink"] = msg.get("template.resetLinkMulti");
-  mail.parameters.template_model = map;   
-  /* Support for localization and fix for non-english Alfresco instances.Also fix to missing template */
-  var mailTemplates = search.xpathSearch("/app:company_home/app:dictionary/app:email_templates/cm:custom-email-template/cm:forgot-password-email.ftl");
-  //mail.parameters.template = companyhome.childByNamePath("Data Dictionary/Email Templates/custom-email-template/forgot-password-email.ftl");
-  if(mailTemplates.length > 0){
-    mail.parameters.template = mailTemplates[0];
-  }else{
-    mail.parameters.text = "Missing template: <Data Dictionary/Email Templates/custom-email-template/forgot-password-email.ftl>";
-  }
+  var map =  {};
+  map.email = u.properties.email;
+  map.emailcontent = emailcontent;
+  map.key = key;
+  map.activitiId = activitiId;
+  map.users = arr;
+  map.resetlink = msg.get("template.resetLinkMulti");
+  mail.parameters.template_model = map;
+  mail.parameters.template = findLocalizedTemplate('forgot-password-email.ftl', serverLocale);
   mail.execute(companyhome);
   logger.log("forgot-password workflow mail -multiple users found- sent to: " + u.properties.email);
-  return mail;
 }
 function getUsersByEmail(email){
   var filter = "email:" + email;
@@ -129,11 +126,12 @@ function disallowedUser(u){
 function main(){
 
   var user, u, email, users, activitiId, userPref;
-  disallowedUsers = s["disallowed-users"].toString().split(",");
+  var serverLocale = utils.getLocale();
+  disallowedUsers = s['disallowed-users'].toString().split(",");
   key = getRandomId(key);
 
   // Returns error if no username or email is provided in the input field
-  if ((json.isNull("email")) || (json.get("email") == null) || (json.get("email").length() == 0)){
+  if ((json.isNull("email")) || (json.get("email") === null) || (json.get("email").length() === 0)){
     status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.noEmailOrUsername"));
     status.redirect = true;
     return;
@@ -145,7 +143,7 @@ function main(){
   if (email.indexOf("@") > -1){
     users = getUsersByEmail(email);
     // Checks if "users" returns more than one result.
-    if (users.length == 0){
+    if (users.length === 0){
       status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.noEmailFound"));
       status.redirect = true;
       return;
@@ -156,6 +154,7 @@ function main(){
         usersArray.push(user.properties.userName);
       }
       // As the email is the same for all users in the array, get user object in order to send reset password instructions to the correct email.
+      // FIXME: shouldn't the activitiId be assigned to all users ??
       user = search.findNode(users[0]);
       disallowedUser(user);
       startWorkflow(key);
@@ -163,7 +162,7 @@ function main(){
       preferenceService.setPreferences(user.properties.userName, {com:{androgogic:{login:{key:key,activiti:activitiId}}}});
       // attempts to send the email
      try{
-      sendMailMultiUser(user, usersArray, msg.get("template.multiple"), key, activitiId);
+      sendMailMultiUser(user, usersArray, msg.get("template.multiple"), key, activitiId, serverLocale);
      } catch (e){
       status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, msg.get("error.mail") + e);
       status.redirect = true;
@@ -177,7 +176,7 @@ function main(){
       activitiId = getActivitiId(key);
       preferenceService.setPreferences(user.properties.userName, {com:{androgogic:{login:{key:key,activiti:activitiId}}}});
       try{
-        sendMailForgotPasswordWorkflow(user, msg.get("template.ignore"), key, activitiId);
+        sendMailForgotPasswordWorkflow(user, msg.get("template.ignore"), key, activitiId, serverLocale);
       } catch (e){
         status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, msg.get("error.mail") + e);
         status.redirect = true;
@@ -194,7 +193,7 @@ function main(){
       preferenceService.setPreferences(user.properties.userName, {com:{androgogic:{login:{key:key,activiti:activitiId}}}});
       // Send e-mail
       try{
-        sendMailForgotPasswordWorkflow(user, msg.get("template.ignore"), key, activitiId);
+        sendMailForgotPasswordWorkflow(user, msg.get("template.ignore"), key, activitiId, serverLocale);
       } catch (e){
         status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, msg.get("error.mail") + e);
         status.redirect = true;

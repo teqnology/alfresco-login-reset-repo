@@ -26,7 +26,7 @@ function isActiviti(activitiId, key){
     a = "activiti$" + wf[w].properties["bpm:taskId"];
     k = wf[w].properties["bpm:description"];
     if(k==key && a==activitiId){
-      return activiti = true;
+      return true;
     }
   }
   return activiti;
@@ -36,17 +36,17 @@ function main(){
 
   var email, users, activitiId, key, allow;
 
-  if ((json.isNull("email")) || (json.get("email") == null) || (json.get("email").length() == 0)){
+  if ((json.isNull("email")) || (json.get("email") === null) || (json.get("email").length() === 0)){
     status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.missingArgument") + "email.");
     status.redirect = true;
     return;
   }
-  if ((json.isNull("activiti")) || (json.get("activiti") == null) || (json.get("activiti").length() == 0)){
+  if ((json.isNull("activiti")) || (json.get("activiti") === null) || (json.get("activiti").length() === 0)){
     status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.missingArgument") + "activiti.");
     status.redirect = true;
     return;
   }
-  if ((json.isNull("key")) || (json.get("key") == null) || (json.get("key").length() == 0)){
+  if ((json.isNull("key")) || (json.get("key") === null) || (json.get("key").length() === 0)){
     status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.missingArgument") + "key.");
     status.redirect = true;
     return;
@@ -60,7 +60,7 @@ function main(){
   users = getUsersByEmail(email);
   allow = isActiviti(activitiId, key);
   logger.log("allow reset-password for account " + email + " is set to: " + allow);
-  if (allow == true){
+  if (allow === true){
     var usersArray = [];
     for (var i = 0; i < users.length; i++) {
       user = search.findNode(users[i]);
@@ -70,7 +70,7 @@ function main(){
   }else{
     status.setCode(status.STATUS_BAD_REQUEST, msg.get("error.noRequest") + email);
     status.redirect = true;
-    return;    
+    return;
   }
 
 }
