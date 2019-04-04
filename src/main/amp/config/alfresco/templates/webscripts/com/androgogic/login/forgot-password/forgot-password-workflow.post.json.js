@@ -181,7 +181,7 @@ function main(){
 
             // register activitiId against all found users
             for (i = 0; i < usersArray.length; i++) {
-                preferenceService.setPreferences(user, {com:{androgogic:{login:{key:key,activiti:activitiId}}}});
+                preferenceService.setPreferences(usersArray[i], {com:{androgogic:{login:{key:key,activiti:activitiId}}}});
             }
         } else if (users.length == 1) {
             // If only one user is returned get user object
